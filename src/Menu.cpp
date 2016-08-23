@@ -6,7 +6,7 @@ Menu::Menu(string pathToFont, int fontSize) {
 }
 
 int Menu::addButton(string label, ofVec2f pos, float w, float h,
-	ofColor bgColor, ofColor labelColor, ofColor pressColor) {
+	ofColor bgColor, ofColor labelColor, ofColor highlightColor, ofColor pressColor) {
 
 	mButtons.push_back(Button());
 	Button& btn = mButtons.back();
@@ -14,6 +14,7 @@ int Menu::addButton(string label, ofVec2f pos, float w, float h,
 	btn.rect = ofRectangle(pos, w, h);
 	btn.bgColor = bgColor;
 	btn.labelColor = labelColor;
+	btn.highlightColor = highlightColor;
 	btn.pressColor = pressColor;
 
 	return (mButtons.size() - 1);
@@ -51,23 +52,34 @@ bool Menu::setButtonPressColor(int idx, ofColor pressColor) {
 	mButtons[idx].pressColor = pressColor; return true;
 }
 
+bool Menu::setButtonHighlightColor(int idx, ofColor highlightColor) {
+	if (idx >= mButtons.size() || idx < 0) return false;
+	mButtons[idx].highlightColor = highlightColor; return true;
+}
+
 bool Menu::getButton(int idx, Button& btn) {
 	if (idx >= mButtons.size() || idx < 0) return false;
 	btn = mButtons[idx]; return true;
 }
 
-int Menu::mousePress(ofVec2f pos) {
+int Menu::hover(ofVec2f pos) {
+	mHoveredBtn = hitTestBtns(pos);
+	mPressedBtn = -1;
+	return mHoveredBtn;
+}
 
+int Menu::press(ofVec2f pos) {
 	mPressedBtn = hitTestBtns(pos);
+	if (mPressedBtn != -1) mPressOffset = pos - mButtons[mPressedBtn].rect.getPosition();
 	return mPressedBtn;
 }
 
-int Menu::mouseDrag(ofVec2f pos) {
+int Menu::drag(ofVec2f pos) {
 	if (mPressedBtn == -1) return -1;
 	mDragPos = pos; return mPressedBtn;
 }
 
-int Menu::mouseRelease(ofVec2f pos) {
+int Menu::release() {
 	int tmp = mPressedBtn;
 	mPressedBtn = -1;
 	return tmp;
@@ -99,9 +111,17 @@ bool Menu::drawButton(int idx) {
 	if (idx >= mButtons.size() || idx < 0) return false;
 	Button& btn = mButtons[idx];
 	ofPushStyle();
+	// draw highlight
+	if (mHoveredBtn == idx) {
+		ofSetColor(btn.highlightColor);
+		ofNoFill();
+		ofSetLineWidth(7);
+		ofDrawRectangle(btn.rect.getPosition() - ofVec2f(5, 5), btn.rect.width + 5, btn.rect.height + 5);
+		ofFill();
+	}
 	// draw box
-	ofColor& col = mPressedBtn == idx ? btn.pressColor : btn.bgColor;
-	ofSetColor(col);
+	ofColor& bgCol = mPressedBtn == idx ? btn.pressColor : btn.bgColor;
+	ofSetColor(bgCol);
 	ofDrawRectangle(btn.rect);
 	// draw label
 	ofSetColor(btn.labelColor);
