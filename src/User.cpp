@@ -32,7 +32,6 @@ bool User::update() {
 	// get new hand states
 	_handStates.left = _bodyPtr->leftHandState;
 	_handStates.right = _bodyPtr->rightHandState;
-	cout << "hand states (l,r): " << _handStates.left << ", " << _handStates.right << endl;
 	return true;
 }
 
@@ -58,6 +57,24 @@ HandState User::getLeftHandState(bool prev) {
 }
 HandState User::getRightHandState(bool prev) {
 	return prev ? _pHandStates.right : _handStates.right;
+}
+
+bool User::isRightHandUp() {
+	if (!jointExists(JointType_HandRight) || !jointExists(JointType_Head)
+		|| _bodyPtr == nullptr)
+		return false;
+	if (getJoint2dPos(JointType_HandRight).y < getJoint2dPos(JointType_Head).y)
+		return true;
+	return false;
+}
+
+bool User::isLeftHandUp() {
+	if (!jointExists(JointType_HandLeft) || !jointExists(JointType_Head)
+		|| _bodyPtr == nullptr)
+		return false;
+	if (getJoint2dPos(JointType_HandLeft).y < getJoint2dPos(JointType_Head).y)
+		return true;
+	return false;
 }
 
 void User::draw(ofVec2f pos, float width, float height) {

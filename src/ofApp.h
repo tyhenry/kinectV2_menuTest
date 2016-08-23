@@ -47,4 +47,11 @@ public:
 
 	ofxPanel gui;
 	bool bDrawGui = false;
+	bool bDrawVertScreen = false;
+
+	ofVec2f btn2pos;
+	ofVec2f btn3posDown; ofVec2f btn3posUp;
+	bool scrollDown = true;
+
+	bool handsUp = false;
 };

@@ -26,6 +26,7 @@ public:
 	bool setButtonBgColor(int idx, ofColor bgColor);
 	bool setButtonPressColor(int idx, ofColor pressColor);
 	bool setButtonHighlightColor(int idx, ofColor highlightColor);
+	ofVec2f getButtonPos(int idx);
 
 	int getNumButtons() { return mButtons.size(); }
 	bool getButton(int idx, Button& btn);
@@ -37,7 +38,12 @@ public:
 
 	bool isPressed(int idx) { return (idx == mPressedBtn); }
 	int getPressed() { return mPressedBtn; } // -1 if none pressed
+	bool isHovered(int idx) { return (idx == mHoveredBtn); }
+	int getHovered() { return mHoveredBtn; } // -1 if none hovered
+	float getHoverTimef() { return mHoverSecs;  }
 
+	ofVec2f getDragPos() { return mDragPos; }
+	ofVec2f getPressOffset() { return mPressOffset;  }
 	ofVec2f getDragPosMinusOffset() { return mDragPos - mPressOffset;  }
 
 	int hitTestBtns(ofVec2f pos); // -1 if none
@@ -56,6 +62,8 @@ protected:
 	int mPressedBtn = -1;
 	ofVec2f mDragPos = ofVec2f(0, 0);
 	ofVec2f mPressOffset = ofVec2f(0, 0); // distance from btn TL corner to press pos
+	float mHoverStart = 0; // start time of hover (0 if no hover)
+	float mHoverSecs = 0; // count seconds that button has been hovered
 
 	ofTrueTypeFont font;
 	ofFbo stringFbo;

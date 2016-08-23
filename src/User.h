@@ -42,6 +42,8 @@ public:
 	TrackingState getTrackingState(JointType type, bool prev=false);
 	HandState getLeftHandState(bool prev = false);
 	HandState getRightHandState(bool prev = false);
+	bool isRightHandUp();
+	bool isLeftHandUp();
 
 	void draw(ofVec2f pos, float width, float height);
 	void draw() { draw(ofVec2f(0, 0), 1920, 1080); }

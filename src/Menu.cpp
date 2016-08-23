@@ -57,26 +57,51 @@ bool Menu::setButtonHighlightColor(int idx, ofColor highlightColor) {
 	mButtons[idx].highlightColor = highlightColor; return true;
 }
 
+ofVec2f Menu::getButtonPos(int idx) {
+	if (idx >= mButtons.size() || idx < 0) return ofVec2f(0, 0);
+	return mButtons[idx].rect.position;
+}
+
 bool Menu::getButton(int idx, Button& btn) {
 	if (idx >= mButtons.size() || idx < 0) return false;
 	btn = mButtons[idx]; return true;
 }
 
 int Menu::hover(ofVec2f pos) {
-	mHoveredBtn = hitTestBtns(pos);
+	if (mHoveredBtn == hitTestBtns(pos)) { // still hovering
+		mHoverSecs = ofGetElapsedTimef() - mHoverStart;
+	}
+	else {
+		mHoveredBtn = hitTestBtns(pos); // get hover idx
+		if (mHoveredBtn != -1) { // new button hover
+			mHoverStart = ofGetElapsedTimef();
+			mHoverSecs = 0;
+		}
+		else { // no hover button
+			mHoverStart = 0;
+			mHoverSecs = 0;
+		}
+	}
+
 	mPressedBtn = -1;
+	mPressOffset = ofVec2f(0, 0);
 	return mHoveredBtn;
 }
 
 int Menu::press(ofVec2f pos) {
 	mPressedBtn = hitTestBtns(pos);
 	if (mPressedBtn != -1) mPressOffset = pos - mButtons[mPressedBtn].rect.getPosition();
+	else mPressOffset = ofVec2f(0, 0);
 	return mPressedBtn;
 }
 
 int Menu::drag(ofVec2f pos) {
-	if (mPressedBtn == -1) return -1;
-	mDragPos = pos; return mPressedBtn;
+	if (mPressedBtn == -1) {
+		mDragPos = ofVec2f(0, 0);
+		return -1;
+	}
+	mDragPos = pos;
+	return mPressedBtn;
 }
 
 int Menu::release() {
